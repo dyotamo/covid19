@@ -6,7 +6,7 @@ class Country {
 
   Country({this.name, this.report});
 
-  factory Country.fromJson(name, List reports) {
+  factory Country.fromJson({name, flag, List reports}) {
     var country = Country(name: name);
     reports.forEach((report) => country.report = Report.fromJson(report));
     return country;

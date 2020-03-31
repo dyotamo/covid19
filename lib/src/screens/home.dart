@@ -11,19 +11,14 @@ class HomeScreen extends StatefulWidget {
 
   static Widget buildListView(List countries) => ListView.builder(
       itemCount: countries.length,
-      itemBuilder: (context, index) {
-        var country = countries[index];
-        return _buildTile(country, context);
-      });
+      itemBuilder: (context, index) => _buildTile(context, countries[index]));
 
-  static Widget _buildTile(country, BuildContext context) => ExpansionTile(
+  static Widget _buildTile(context, country) => ExpansionTile(
         title: Text(
           country.name,
-          style: Theme.of(context).textTheme.title,
+          style: Theme.of(context).textTheme.subtitle,
         ),
-        leading: CircleAvatar(
-          child: Text(country.name[0]),
-        ),
+        leading: CircleAvatar(child: Text(country.name[0])),
         children: <Widget>[
           _buildReport(context, country.report),
         ],
@@ -34,6 +29,7 @@ class HomeScreen extends StatefulWidget {
     return Padding(
       padding: const EdgeInsets.all(15.0),
       child: Card(
+        elevation: 8.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(
@@ -137,14 +133,16 @@ class _HomeScreenState extends State<HomeScreen> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            height: 150.0,
+            height: 175.0,
             child: Column(children: <Widget>[
+              Text(
+                'Casos Globais',
+                style: Theme.of(context).textTheme.display1,
+              ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.all(15.0),
                 child: Text(
-                  'Casos Globais',
-                  style: Theme.of(context).textTheme.display1,
-                ),
+                    'Última actualização: ${DateFormat('dd/mm/yyyy').format(global.date)}'),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
