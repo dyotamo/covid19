@@ -1,9 +1,12 @@
 import 'package:covid19/src/client/api.dart';
 import 'package:covid19/src/delegate/search.dart';
+import 'package:covid19/src/models/country.dart';
 import 'package:covid19/src/models/global.dart';
 import 'package:covid19/src/models/reportable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:intl/intl.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -37,25 +40,65 @@ class HomeScreen extends StatelessWidget {
                 )),
               );
             else
-              return Center(
-                  child: SpinKitDoubleBounce(
-                      color: Theme.of(context).primaryColor));
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      'Carregando dados...',
+                      textAlign: TextAlign.center,
+                      style: Theme.of(context).textTheme.headline,
+                    ),
+                  ),
+                  Center(
+                      child: SpinKitDoubleBounce(
+                          color: Theme.of(context).primaryColor)),
+                ],
+              );
           }));
 
   static Widget buildListView(List countries) => ListView.builder(
       itemCount: countries.length,
       itemBuilder: (context, index) => _buildTile(context, countries[index]));
 
-  static Widget _buildTile(context, country) => ExpansionTile(
-        title: Text(
-          country.name,
-          style: Theme.of(context).textTheme.subtitle,
+  static Widget _buildTile(context, Country country) => Padding(
+        padding: const EdgeInsets.all(5.0),
+        child: Card(
+          elevation: 5.0,
+          child: ExpansionTile(
+            title: Text(
+              country.name,
+              style: Theme.of(context).textTheme.subtitle,
+            ),
+            leading: FutureBuilder<String>(
+                future: country.flag,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return SvgPicture.network(
+                      snapshot.data,
+                      key: Key(snapshot.data),
+                      width: 50.0,
+                      fit: BoxFit.cover,
+                      placeholderBuilder: (context) =>
+                          _buildImagePlaceholder(country),
+                    );
+                  }
+
+                  return _buildImagePlaceholder(country);
+                }),
+            children: <Widget>[
+              _buildReport(context, country),
+            ],
+          ),
         ),
-        leading: CircleAvatar(child: Text(country.name[0])),
-        children: <Widget>[
-          _buildReport(context, country),
-        ],
       );
+
+  static Container _buildImagePlaceholder(Country country) {
+    return Container(
+        width: 50.0,
+        child: CircleAvatar(child: Text(country.name.substring(0, 2))));
+  }
 
   Widget _buildAppBar(context, countries) => AppBar(
         title: Text('Relátrio - COVID19'),
@@ -72,16 +115,16 @@ class HomeScreen extends StatelessWidget {
     return Padding(
         padding: const EdgeInsets.all(5.0),
         child: Padding(
-          padding: const EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(5.0),
           child: Container(
-            height: 250.0,
+            height: 200.0,
             child: Column(children: <Widget>[
               Text(
                 'Casos Globais',
-                style: Theme.of(context).textTheme.display1,
+                style: Theme.of(context).textTheme.headline,
               ),
               Padding(
-                padding: const EdgeInsets.all(15.0),
+                padding: const EdgeInsets.all(5.0),
                 child: Text(
                     'Última actualização: ${DateFormat('dd/mm/yyyy').format(reportable.date)}'),
               ),
@@ -100,7 +143,7 @@ class HomeScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           Column(children: <Widget>[
-            Icon(Icons.report, size: 40.0, color: Colors.red),
+            Icon(FontAwesomeIcons.hospitalUser, size: 40.0, color: Colors.red),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text('Confirmados'),
@@ -115,7 +158,7 @@ class HomeScreen extends StatelessWidget {
             )
           ]),
           Column(children: <Widget>[
-            Icon(Icons.clear, size: 40.0),
+            Icon(FontAwesomeIcons.dizzy, size: 40.0),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text('Mortes'),
@@ -133,7 +176,7 @@ class HomeScreen extends StatelessWidget {
             Icon(Icons.healing, size: 40.0, color: Colors.green),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Recuperados'),
+              child: Text('Curados'),
             ),
             Text(
               format.format(reportable.recovered),
