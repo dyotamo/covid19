@@ -1,17 +1,22 @@
-import 'package:covid19/src/models/report.dart';
+import 'package:covid19/src/models/reportable.dart';
+import 'package:intl/intl.dart';
 
-class Country {
+class Country extends Reportable {
   String name;
-  Report report;
 
-  Country({this.name, this.report});
+  Country(this.name);
 
-  factory Country.fromJson({name, flag, List reports}) {
-    var country = Country(name: name);
-    reports.forEach((report) => country.report = Report.fromJson(report));
+  factory Country.fromJson(name, reports) {
+    var country = Country(name);
+    reports.forEach((report) {
+      country.date = DateFormat('yyyy-mm-dd').parse(report['date']);
+      country.confirmed = report['confirmed'];
+      country.deaths = report['deaths'];
+      country.recovered = report['recovered'];
+    });
     return country;
   }
 
   @override
-  String toString() => '[country: $name, report: $report]';
+  String toString() => name;
 }

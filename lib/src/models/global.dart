@@ -1,13 +1,3 @@
-class Global {
-  DateTime date;
-  int confirmed;
-  int deaths;
-  int recovered;
+import 'package:covid19/src/models/reportable.dart';
 
-  Global({
-    this.date,
-    this.confirmed,
-    this.deaths,
-    this.recovered,
-  });
-}
+class Global extends Reportable {}

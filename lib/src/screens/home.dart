@@ -1,13 +1,46 @@
 import 'package:covid19/src/client/api.dart';
 import 'package:covid19/src/delegate/search.dart';
 import 'package:covid19/src/models/global.dart';
-import 'package:covid19/src/models/report.dart';
+import 'package:covid19/src/models/reportable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:intl/intl.dart';
 
-class HomeScreen extends StatefulWidget {
-  @override
-  _HomeScreenState createState() => _HomeScreenState();
+class HomeScreen extends StatelessWidget {
+  Widget build(BuildContext context) => Scaffold(
+      body: FutureBuilder<Map<String, dynamic>>(
+          future: fetchData(),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              Global global = snapshot.data['global'];
+              List countries = snapshot.data['countries'];
+
+              return Scaffold(
+                appBar: _buildAppBar(context, countries),
+                body: Column(
+                  children: <Widget>[
+                    _buildGlobalReport(context, global),
+                    Expanded(
+                      child: HomeScreen.buildListView(countries),
+                    ),
+                  ],
+                ),
+              );
+            } else if (snapshot.hasError)
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Center(
+                    child: Text(
+                  snapshot.error.toString(),
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.subtitle,
+                )),
+              );
+            else
+              return Center(
+                  child: SpinKitDoubleBounce(
+                      color: Theme.of(context).primaryColor));
+          }));
 
   static Widget buildListView(List countries) => ListView.builder(
       itemCount: countries.length,
@@ -20,102 +53,12 @@ class HomeScreen extends StatefulWidget {
         ),
         leading: CircleAvatar(child: Text(country.name[0])),
         children: <Widget>[
-          _buildReport(context, country.report),
+          _buildReport(context, country),
         ],
       );
 
-  static Widget _buildReport(context, Report report) {
-    final format = NumberFormat();
-    return Padding(
-      padding: const EdgeInsets.all(15.0),
-      child: Card(
-        elevation: 8.0,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: <Widget>[
-              Column(children: <Widget>[
-                Icon(Icons.report, size: 40.0, color: Colors.red),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text('Confirmados'),
-                ),
-                Text(
-                  format.format(report.confirmed),
-                  style: Theme.of(context).textTheme.subtitle,
-                )
-              ]),
-              Column(children: <Widget>[
-                Icon(Icons.clear, size: 40.0),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text('Mortes'),
-                ),
-                Text(
-                  format.format(report.deaths),
-                  style: Theme.of(context).textTheme.subtitle,
-                )
-              ]),
-              Column(children: <Widget>[
-                Icon(Icons.healing, size: 40.0, color: Colors.green),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text('Recuperados'),
-                ),
-                Text(
-                  format.format(report.recovered),
-                  style: Theme.of(context).textTheme.subtitle,
-                )
-              ])
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  @override
-  Widget build(BuildContext context) => Scaffold(
-          body: RefreshIndicator(
-        child: FutureBuilder<Map<String, dynamic>>(
-            future: fetchData(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                Global global = snapshot.data['global'];
-                List countries = snapshot.data['countries'];
-
-                return Scaffold(
-                  appBar: _buildAppBar(context, countries),
-                  body: Column(
-                    children: <Widget>[
-                      _buildGlobalReport(context, global),
-                      Expanded(
-                        child: HomeScreen.buildListView(countries),
-                      ),
-                    ],
-                  ),
-                );
-              } else if (snapshot.hasError)
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Center(
-                      child: Text(
-                    snapshot.error.toString(),
-                    textAlign: TextAlign.center,
-                    style: Theme.of(context).textTheme.subtitle,
-                  )),
-                );
-              else
-                return Center(child: CircularProgressIndicator());
-            }),
-        onRefresh: () => _refresh(),
-      ));
-
   Widget _buildAppBar(context, countries) => AppBar(
-        title: Text('Mapa do COVID-19'),
+        title: Text('Relátrio - COVID19'),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.search),
@@ -125,15 +68,13 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       );
 
-  Widget _buildGlobalReport(context, Global global) {
-    final format = NumberFormat();
-
+  static Widget _buildGlobalReport(context, reportable) {
     return Padding(
         padding: const EdgeInsets.all(5.0),
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Container(
-            height: 175.0,
+            height: 250.0,
             child: Column(children: <Widget>[
               Text(
                 'Casos Globais',
@@ -142,52 +83,69 @@ class _HomeScreenState extends State<HomeScreen> {
               Padding(
                 padding: const EdgeInsets.all(15.0),
                 child: Text(
-                    'Última actualização: ${DateFormat('dd/mm/yyyy').format(global.date)}'),
+                    'Última actualização: ${DateFormat('dd/mm/yyyy').format(reportable.date)}'),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(children: <Widget>[
-                    Icon(Icons.report, size: 40.0, color: Colors.red),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Confirmados'),
-                    ),
-                    Text(
-                      format.format(global.confirmed),
-                      style: Theme.of(context).textTheme.subtitle,
-                    )
-                  ]),
-                  Column(children: <Widget>[
-                    Icon(Icons.clear, size: 40.0),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Mortes'),
-                    ),
-                    Text(
-                      format.format(global.deaths),
-                      style: Theme.of(context).textTheme.subtitle,
-                    )
-                  ]),
-                  Column(children: <Widget>[
-                    Icon(Icons.healing, size: 40.0, color: Colors.green),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text('Recuperados'),
-                    ),
-                    Text(
-                      format.format(global.recovered),
-                      style: Theme.of(context).textTheme.subtitle,
-                    )
-                  ])
-                ],
-              ),
+              _buildReport(context, reportable),
             ]),
           ),
         ));
   }
 
-  Future<void> _refresh() {
-    return Future.value();
+  static Widget _buildReport(context, Reportable reportable) {
+    final format = NumberFormat();
+
+    return Padding(
+      padding: const EdgeInsets.all(10.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: <Widget>[
+          Column(children: <Widget>[
+            Icon(Icons.report, size: 40.0, color: Colors.red),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Confirmados'),
+            ),
+            Text(
+              format.format(reportable.confirmed),
+              style: Theme.of(context).textTheme.subtitle,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(reportable.confirmedPerc),
+            )
+          ]),
+          Column(children: <Widget>[
+            Icon(Icons.clear, size: 40.0),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Mortes'),
+            ),
+            Text(
+              format.format(reportable.deaths),
+              style: Theme.of(context).textTheme.subtitle,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(reportable.deathsPerc),
+            )
+          ]),
+          Column(children: <Widget>[
+            Icon(Icons.healing, size: 40.0, color: Colors.green),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text('Recuperados'),
+            ),
+            Text(
+              format.format(reportable.recovered),
+              style: Theme.of(context).textTheme.subtitle,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(reportable.recoveredPerc),
+            )
+          ])
+        ],
+      ),
+    );
   }
 }
