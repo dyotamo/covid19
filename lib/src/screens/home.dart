@@ -54,6 +54,9 @@ class HomeScreen extends StatelessWidget {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
+                  Center(
+                      child: SpinKitDoubleBounce(
+                          color: Theme.of(context).primaryColor)),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
@@ -62,9 +65,6 @@ class HomeScreen extends StatelessWidget {
                       style: Theme.of(context).textTheme.headline,
                     ),
                   ),
-                  Center(
-                      child: SpinKitDoubleBounce(
-                          color: Theme.of(context).primaryColor)),
                 ],
               );
           }));
@@ -138,7 +138,7 @@ class HomeScreen extends StatelessWidget {
             height: 180.0,
             child: Column(children: <Widget>[
               Text(
-                'Todo o Mundo',
+                'Global',
                 style: Theme.of(context).textTheme.display1,
               ),
               _buildReport(context, reportable),
