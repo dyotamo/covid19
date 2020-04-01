@@ -112,11 +112,17 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildAppBar(context, countries) => AppBar(
+        backgroundColor: Colors.white,
         title: Text(
-            'Casos em ${DateFormat('dd/mm/yyyy').format(countries.first.date)}'),
+          'Casos em ${DateFormat('dd/mm/yyyy').format(countries.first.date)}',
+          style: TextStyle(color: Colors.black),
+        ),
         actions: <Widget>[
           IconButton(
-              icon: Icon(Icons.search),
+              icon: Icon(
+                Icons.search,
+                color: Colors.black,
+              ),
               onPressed: () => showSearch(
                   context: context,
                   delegate: CountrySearch(results: countries)))
