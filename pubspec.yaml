@@ -4,7 +4,7 @@ description: A new Flutter project.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.1.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   flutter:
@@ -15,6 +15,7 @@ dependencies:
   flutter_svg:
   flutter_spinkit:
   font_awesome_flutter:
+  pie_chart:
 
 
 dev_dependencies:
