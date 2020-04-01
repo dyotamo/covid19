@@ -20,13 +20,24 @@ class HomeScreen extends StatelessWidget {
 
               return Scaffold(
                 appBar: _buildAppBar(context, countries),
-                body: Column(
-                  children: <Widget>[
-                    _buildGlobalReport(context, global),
-                    Expanded(
-                      child: HomeScreen.buildListView(countries),
-                    ),
-                  ],
+                body: OrientationBuilder(
+                  builder: (context, orientation) =>
+                      (orientation == Orientation.landscape)
+                          ? Row(
+                              children: <Widget>[
+                                _buildGlobalReport(context, global),
+                                Expanded(
+                                    child: HomeScreen.buildListView(countries)),
+                              ],
+                            )
+                          : Column(
+                              children: <Widget>[
+                                _buildGlobalReport(context, global),
+                                Expanded(
+                                  child: HomeScreen.buildListView(countries),
+                                ),
+                              ],
+                            ),
                 ),
               );
             } else if (snapshot.hasError)
@@ -65,11 +76,11 @@ class HomeScreen extends StatelessWidget {
   static Widget _buildTile(context, Country country) => Padding(
         padding: const EdgeInsets.all(5.0),
         child: Card(
-          elevation: 5.0,
+          elevation: 2.5,
           child: ExpansionTile(
             title: Text(
               country.name,
-              style: Theme.of(context).textTheme.subtitle,
+              style: Theme.of(context).textTheme.title,
             ),
             leading: FutureBuilder<String>(
                 future: country.flag,
