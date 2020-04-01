@@ -78,10 +78,8 @@ class HomeScreen extends StatelessWidget {
         child: Card(
           elevation: 2.5,
           child: ExpansionTile(
-            title: Text(
-              country.name,
-              style: Theme.of(context).textTheme.title,
-            ),
+            title:
+                Text(country.name, style: Theme.of(context).textTheme.subtitle),
             leading: FutureBuilder<String>(
                 future: country.flag,
                 builder: (context, snapshot) {
