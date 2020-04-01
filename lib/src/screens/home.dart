@@ -101,7 +101,8 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildAppBar(context, countries) => AppBar(
-        title: Text('Relátrio - COVID19'),
+        title: Text(
+            'Casos em ${DateFormat('dd/mm/yyyy').format(countries.first.date)}'),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.search),
@@ -117,16 +118,11 @@ class HomeScreen extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(5.0),
           child: Container(
-            height: 200.0,
+            height: 180.0,
             child: Column(children: <Widget>[
               Text(
-                'Casos Globais',
-                style: Theme.of(context).textTheme.headline,
-              ),
-              Padding(
-                padding: const EdgeInsets.all(5.0),
-                child: Text(
-                    'Última actualização: ${DateFormat('dd/mm/yyyy').format(reportable.date)}'),
+                'Todo o Mundo',
+                style: Theme.of(context).textTheme.display1,
               ),
               _buildReport(context, reportable),
             ]),
